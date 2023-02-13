@@ -1,4 +1,3 @@
-use hex_literal::hex;
 use sha3::{Digest, Sha3_256};
 
 pub fn hash(element: String) -> Vec<u8> {
@@ -18,6 +17,7 @@ pub fn hash_pair(a: Vec<u8>, b: Vec<u8>) -> Vec<u8>{
 #[cfg(test)]
 mod tests {
     use crate::hasher::*;
+    use hex_literal::hex;
 
     #[test]
     fn hash_of_hola_is_correct() {
