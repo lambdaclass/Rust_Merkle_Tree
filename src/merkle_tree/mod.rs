@@ -9,10 +9,9 @@ pub struct MerkleTree {
 
 impl MerkleTree {
     pub fn new(elements: &[String]) -> MerkleTree{
-        let mut tree = MerkleTree{hashes: vec![], count:  elements.len()};
-        let leaves = tree.hash_elements(elements);
-        tree.hashes = tree.build_hashes(leaves);
-        tree
+        let leaves = Self::hash_elements(elements);
+        let hashes = Self::build_hashes(leaves);
+        MerkleTree{hashes, count:  elements.len()}
     }
 
     pub fn root(&self) -> &[u8] {
@@ -20,25 +19,25 @@ impl MerkleTree {
     }
 
     pub fn add(&mut self, elements: &[String]) {
-        let new_leaves = self.hash_elements(&elements);
+        let new_leaves = Self::hash_elements(&elements);
         let old_leaves = self.hashes[{self.count-1}..].to_vec();
         let leaves = [old_leaves, new_leaves].concat();
         let count =  leaves.len();
-        self.hashes = self.build_hashes(leaves);
+        self.hashes = Self::build_hashes(leaves);
         self.count = count;
     }
 
-    fn hash_elements(&self, elements: &[String]) -> Vec<Vec<u8>> {
+    fn hash_elements(elements: &[String]) -> Vec<Vec<u8>> {
         elements.iter().map(|e| hash(e.to_string())).collect()
     }
 
-    fn build_hashes(&self, hashes: Vec<Vec<u8>>) -> Vec<Vec<u8>> {
+    fn build_hashes(hashes: Vec<Vec<u8>>) -> Vec<Vec<u8>> {
         if hashes.len() == 1 {
             return hashes;
         }
 
         let h: Vec<Vec<u8>>= hashes.chunks(2).clone().into_iter().map(|e| hash_pair(e[0].clone(), e[1].clone())).collect();
-        [self.build_hashes(h), hashes].concat()
+        [Self::build_hashes(h), hashes].concat()
     }
 
     fn proof(&self, mut index: usize) -> Vec<Vec<u8>> {
@@ -52,14 +51,14 @@ impl MerkleTree {
             };
             proof.append(&mut vec![h]);
             index = index/2;
-            i = {i+1}/2 - 1;
+            i = (i+1)/2 - 1;
         }
         proof
     }
 
     fn verify(&self, proof: &[Vec<u8>], mut index: usize) -> bool {
         let mut hash = self.hashes[self.count-1+index].clone();
-        for p in proof.iter() {
+        for p in proof {
             hash = match index.rem(2) {
                 0 => hash_pair(hash, p.to_vec()),
                 _ => hash_pair(p.to_vec(), hash)
