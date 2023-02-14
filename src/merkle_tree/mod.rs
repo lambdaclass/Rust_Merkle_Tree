@@ -56,6 +56,19 @@ impl MerkleTree {
         }
         proof
     }
+
+    fn verify(&self, proof: &[Vec<u8>], mut index: usize) -> bool {
+        let mut hash = self.hashes[self.count-1+index].clone();
+        for p in proof.iter() {
+            hash = match index.rem(2) {
+                0 => hash_pair(hash, p.to_vec()),
+                _ => hash_pair(p.to_vec(), hash)
+            };
+            index = index/2;
+        }
+
+        hash == self.root()
+    }
 }
 
 
@@ -150,4 +163,22 @@ mod tests {
         let expected_proof = vec![heippa, hola_moikka, privet_bonjour_konichiwa_rytsas];
         assert_eq!(tree.proof(3), expected_proof);
     }
+
+    #[test]
+    fn verify_the_fourth_element_of_eight() {
+        let elements = [
+            "hola".to_string(), 
+            "moikka".to_string(), 
+            "heippa".to_string(), 
+            "ahoj".to_string(),
+            "privet".to_string(), 
+            "bonjour".to_string(), 
+            "konichiwa".to_string(),
+            "rytsas".to_string()
+        ];
+        let tree = MerkleTree::new(&elements);
+        let proof = tree.proof(3);
+        assert!(tree.verify(&proof, 3));
+    }
+    
 }
