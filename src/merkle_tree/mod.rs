@@ -46,18 +46,14 @@ impl MerkleTree {
         let mut i = self.count-1;
 
         while i != 0 {
-            let h: Vec<u8>;
-            if index.rem(2) == 0 {
-                h = self.hashes[index+1+i].clone();
-            } else {
-                h = self.hashes[index+i-1].clone();
-            }
+            let h: Vec<u8> = match index.rem(2) {
+                0 => self.hashes[index+1+i].clone(),
+                _ => self.hashes[index+i-1].clone()
+            };
             proof.append(&mut vec![h]);
-
             index = index/2;
             i = {i+1}/2 - 1;
         }
-
         proof
     }
 }
