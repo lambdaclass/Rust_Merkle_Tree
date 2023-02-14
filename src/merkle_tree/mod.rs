@@ -15,7 +15,7 @@ impl MerkleTree {
         tree
     }
 
-    pub fn root_hash(&self) -> &[u8] {
+    pub fn root(&self) -> &[u8] {
         &self.hashes[0]
     }
 
@@ -69,14 +69,14 @@ mod tests {
     fn root_hash_of_hola_moikka_is_correct() {
         let tree = MerkleTree::new(&["hola".to_string(), "moikka".to_string()]);
 
-        assert_eq!(tree.root_hash(), hex!("d703ed960de71d89e617a637f87813b9da95461f30d5d5030329b979ff931032"));
+        assert_eq!(tree.root(), hex!("d703ed960de71d89e617a637f87813b9da95461f30d5d5030329b979ff931032"));
     }
 
     #[test]
     fn when_adding_two_more_elements_to_the_tree_the_root_hash_is_correct() {
         let mut tree = MerkleTree::new(&["hola".to_string(), "moikka".to_string()]);
         tree.add( &["heippa".to_string(), "ahoj".to_string()]);
-        assert_eq!(tree.root_hash(), hex!("8321751cd2de3135bcc3ee9ad978061b284d1ec23f83279192ebcc3666c9e5cc"));
+        assert_eq!(tree.root(), hex!("8321751cd2de3135bcc3ee9ad978061b284d1ec23f83279192ebcc3666c9e5cc"));
     }
 
     #[test]
